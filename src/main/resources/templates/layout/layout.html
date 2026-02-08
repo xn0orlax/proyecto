@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org"
-	th:fragment="layout">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:fragment="layout">
 
 <head>
 	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title th:text="${title} ?: 'App'"></title>
-
 	<!-- Bootstrap -->
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
@@ -26,22 +25,78 @@
 			font-weight: bold;
 			color: #6f42c1;
 		}
+
+		body {
+			background: #f8f9fb;
+		}
+
+		.card {
+			border-radius: 14px;
+		}
+
+		.btn {
+			border-radius: 10px;
+		}
+
+		.sidebar {
+			background: #ffffff;
+		}
+
+		.nav-link {
+			border-radius: 8px;
+		}
+
+		.nav-link.active {
+			background: #f3f0ff;
+			color: #6f42c1;
+		}
 	</style>
 </head>
 
 <body>
 
+	<!--	<div class="d-flex">-->
+
+	<!--		 Sidebar -->
+	<!--		<div th:replace="~{layout/sidebar :: sidebar(${active})}"></div>-->
+
+	<!--		 Content -->
+	<!--		<main class="flex-fill p-4">-->
+	<!--			<div th:insert="~{::content}"></div>-->
+	<!--		</main>-->
+
+	<!--	</div>-->
+
+	<!-- Mobile top bar -->
+	<nav class="navbar d-md-none bg-white border-bottom px-3">
+		<button class="btn btn-outline-secondary" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar">
+			<i class="bi bi-list"></i>
+		</button>
+		<span class="fw-bold">Capri</span>
+	</nav>
+
 	<div class="d-flex">
+		<!-- Desktop sidebar -->
+		<div class="d-none d-md-block">
+			<div th:replace="~{layout/sidebar :: sidebar(${active})}"></div>
+		</div>
 
-		<!-- Sidebar -->
-		<div th:replace="~{layout/sidebar :: sidebar(${active})}"></div>
+		<!-- Mobile sidebar -->
+		<div class="offcanvas offcanvas-start d-md-none" id="mobileSidebar">
+			<div class="offcanvas-header">
+				<h5>Menú</h5>
+				<button class="btn-close" data-bs-dismiss="offcanvas"></button>
+			</div>
+			<div class="offcanvas-body p-0">
+				<div th:replace="~{layout/sidebar :: sidebar(${active})}"></div>
+			</div>
+		</div>
 
-		<!-- Content -->
-		<main class="flex-fill p-4">
+		<main class="flex-fill p-3 p-md-4">
 			<div th:insert="~{::content}"></div>
 		</main>
-
 	</div>
+
 
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>

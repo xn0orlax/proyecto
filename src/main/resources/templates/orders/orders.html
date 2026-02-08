@@ -10,17 +10,21 @@
 <body class="container">
 
 	<div th:fragment="content">
-	<div th:if="${success != null AND msgType != null}">
-		<th:block th:switch="${msgType}">
-			<div th:case="'msg-open-error'" class="alert alert-danger" th:text="#{error.open.day.orders}"></div>
-			<div th:case="'custom-error-message'" class="alert alert-danger" th:text="${msg}"></div>
-		</th:block>
-	</div>
+		<div th:if="${success != null AND msgType != null}">
+			<th:block th:switch="${msgType}">
+				<div th:case="'msg-open-error'" class="alert alert-danger" th:text="#{error.open.day.orders}"></div>
+				<div th:case="'custom-error-message'" class="alert alert-danger" th:text="${msg}"></div>
+			</th:block>
+		</div>
 		<h2>[[${title}]]</h2>
-		<a th:href="@{/orders/new}" class="btn btn-primary mb-3">Agregar orden</a>
-		
+		<!--		<a th:href="@{/orders/new}" class="btn btn-primary mb-3">Agregar orden</a>-->
+		<a th:href="@{/orders/new}" class="btn btn-primary w-100 w-md-auto mb-3">
+			<i class="bi bi-plus-circle me-1"></i> Agregar orden
+		</a>
+
+
 		<th:block th:if="${!orders.isEmpty()}">
-			<table class="table table-hover">
+			<table class="table table-hover d-none d-md-table">
 				<thead>
 					<tr>
 						<th class="w-15" scope="col">Etiqueta</th>
@@ -38,11 +42,13 @@
 						</td>
 						<td th:text="${#temporals.format(order.createdAt, 'dd-MM-yyyy HH:mm:ss')}"></td>
 						<td>
-							<p th:if="${order.status.description != 'En progreso'}" class="text-start">[[${#temporals.format(order.updatedAt, 'dd-MM-yyyy HH:mm:ss')}]]</p>
+							<p th:if="${order.status.description != 'En progreso'}" class="text-start">
+								[[${#temporals.format(order.updatedAt, 'dd-MM-yyyy HH:mm:ss')}]]</p>
 							<p th:if="${order.status.description == 'En progreso'}" class="text-start">---</p>
 						</td>
 						<td>
-							<p class="text-start">$[[${#numbers.formatDecimal(order.total, 0, 'COMMA', 2, 'POINT')}]]</p>
+							<p class="text-start">$[[${#numbers.formatDecimal(order.total, 0, 'COMMA', 2, 'POINT')}]]
+							</p>
 						</td>
 						<td>
 							<span th:if="${order.status.description == 'En progreso'}"
@@ -54,27 +60,80 @@
 						</td>
 						<td>
 							<th:block th:if="${order.status.description == 'En progreso'}">
-								<form th:action="@{/orders/{id}/deliver(id=${order.id})}" method="post" class="d-inline">
-									<button class="btn btn-success btn-sm" onclick="return confirm('¿Marcar esta orden como ENTREGADA?')">
+								<form th:action="@{/orders/{id}/deliver(id=${order.id})}" method="post"
+									class="d-inline">
+									<button class="btn btn-success btn-sm"
+										onclick="return confirm('¿Marcar esta orden como ENTREGADA?')">
 										Entregar
 									</button>
 								</form>
 							</th:block>
 							<th:block th:if="${order.status.description == 'En progreso'}">
-								<a th:href="@{/orders/edit/{id}(id=${order.id})}" class="btn btn-warning btn-sm">Editar</a>
+								<a th:href="@{/orders/edit/{id}(id=${order.id})}"
+									class="btn btn-warning btn-sm">Editar</a>
 							</th:block>
-							<th:block th:if="${order.status.description == 'En progreso'}" sec:authorize="hasRole('ADMIN')">
+							<th:block th:if="${order.status.description == 'En progreso'}"
+								sec:authorize="hasRole('ADMIN')">
 								<form th:action="@{/orders/{id}/cancel(id=${order.id})}" method="post" class="d-inline">
-									<button class="btn btn-danger btn-sm" th:onclick="return confirm('¿Cancelar esta orden?')">
+									<button class="btn btn-danger btn-sm"
+										th:onclick="return confirm('¿Cancelar esta orden?')">
 										Cancelar
 									</button>
 								</form>
 							</th:block>
-							<a th:href="@{/orders/details/{id}(id=${order.id})}" class="btn btn-primary btn-sm text-white">Detalles</a>
+							<a th:href="@{/orders/details/{id}(id=${order.id})}"
+								class="btn btn-primary btn-sm text-white">Detalles</a>
 						</td>
 					</tr>
 				</tbody>
 			</table>
+			<div class="d-md-none">
+				<div class="card mb-3 shadow-sm" th:each="order : ${orders}">
+					<div class="card-body">
+						<div class="d-flex justify-content-between align-items-center">
+							<span class="fw-bold" th:text="${order.description}"></span>
+
+							<span th:if="${order.status.description == 'En progreso'}"
+								class="badge bg-warning">Pendiente</span>
+							<span th:if="${order.status.description == 'Entregado'}"
+								class="badge bg-success">Entregado</span>
+							<span th:if="${order.status.description == 'Cancelado'}"
+								class="badge bg-danger">Cancelado</span>
+						</div>
+
+						<div class="text-muted small mt-1">
+							Orden: [[${#temporals.format(order.createdAt,'dd/MM HH:mm')}]]
+						</div>
+
+						<div class="fs-5 fw-semibold mt-2">
+							$[[${#numbers.formatDecimal(order.total,0,'COMMA',2,'POINT')}]]
+						</div>
+
+						<div class="d-flex gap-2 mt-3 flex-wrap">
+							<a th:href="@{/orders/details/{id}(id=${order.id})}" class="btn btn-outline-primary btn-sm">
+								Detalles
+							</a>
+							<th:block th:if="${order.status.description == 'En progreso'}">
+								<form th:action="@{/orders/{id}/deliver(id=${order.id})}" method="post">
+									<button class="btn btn-success btn-sm">
+										Entregar
+									</button>
+								</form>
+								<a th:href="@{/orders/edit/{id}(id=${order.id})}"
+									class="btn btn-warning btn-sm">Editar</a>
+								<form sec:authorize="hasRole('ADMIN')"
+									th:action="@{/orders/{id}/cancel(id=${order.id})}" method="post" class="d-inline">
+									<button class="btn btn-danger btn-sm"
+										th:onclick="return confirm('¿Cancelar esta orden?')">
+										Cancelar
+									</button>
+								</form>
+							</th:block>
+						</div>
+					</div>
+				</div>
+			</div>
+
 			<h3>
 				Total: $[[${#numbers.formatDecimal(total, 0, 'COMMA', 2, 'POINT')}]]
 			</h3>

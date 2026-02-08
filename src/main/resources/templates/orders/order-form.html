@@ -33,7 +33,11 @@
 					<tbody>
 						<tr th:each="item, stat : ${entry.value}"
 							th:data-price="${item.itemPrice}">
-							<td th:text="${item.itemName}"></td>
+							<td>
+								<p>[[${item.itemName}]]<br>
+								[[${item.itemSize.name}]
+								</p>
+							</td>
 							<td>
 								$[[${#numbers.formatDecimal(item.itemPrice, 0, 'COMMA', 2, 'POINT')}]]
 							</td>
