@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en" th:replace="~{layout/layout :: layout}">
+
+<head>
+	<title>Productos</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+	<meta charset="UTF-8">
+</head>
+
+<body class="container">
+
+	<div th:fragment="content">
+
+		<h2>Productos del Restaurante</h2>
+		<a th:href="@{/products/new}" class="btn btn-primary mb-3">Agregar Producto</a>
+		
+		<div th:each="entry : ${productsByCategory}">
+			<hr>
+			<h4 th:text="${entry.key.name}">Category name</h4>
+			<hr>
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th class="w-25" scope="col">Producto</th>
+						<th class="w-15" scope="col">Precio</th>
+						<th class="w-15" scope="col">Tamaño</th>
+						<th class="w-15 text-center" scope="col">Estatus</th>
+						<th class="w-30 text-center" scope="col">Acciones</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="p : ${entry.value}">
+						<td>
+							<span>[[${p.name}]]</span>
+							<p class="fst-italic" th:if="${p.description != null AND not #strings.isEmpty(p.description)}">
+								([[${p.description}]])
+							</p>
+						</td>
+						<td>$[[${#numbers.formatDecimal(p.price, 0, 'COMMA', 2, 'POINT')}]]</td>
+						<td class="">
+							<span th:text="${p.size.name + ' (' + p.size.description + ')'}"></span>
+						</td>
+						<td class="text-center" th:text="${p.status} ? '✅' : '❌'"></td>
+						<td class="text-center">
+							<a th:href="@{/products/edit/{id}(id=${p.id})}" class="btn btn-warning btn-sm">Editar</a>
+							<a th:href="@{/products/delete/{id}(id=${p.id})}" class="btn btn-danger btn-sm">Eliminar</a>
+							
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+</body>
+
+</html>
