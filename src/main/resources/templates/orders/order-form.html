@@ -21,58 +21,106 @@
 			</div>
 			<th:block th:each="entry : ${itemsByCategory}">
 				<h4 th:text="${entry.key.name}" class="mt-4"></h4>
-				<table class="table">
-					<thead>
-						<tr>
-							<th class="w-25" scope="col">Producto</th>
-							<th class="w-25" scope="col">P. Unitario</th>
-							<th class="w-25" scope="col">Cantidad</th>
-							<th class="w-25" scope="col">Total</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr th:each="item, stat : ${entry.value}"
-							th:data-price="${item.itemPrice}">
-							<td>
-								<p>[[${item.itemName}]]<br>
-								[[${item.itemSize.name}]
-								</p>
-							</td>
-							<td>
+				<div class="d-none d-md-block">
+					<table class="table align-middle">
+						<thead>
+							<tr>
+								<th class="w-25" scope="col">Producto</th>
+								<th class="w-25" scope="col">P. Unitario</th>
+								<th class="w-25" scope="col">Cantidad</th>
+								<th class="w-25" scope="col">Total</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="item, stat : ${entry.value}" th:data-price="${item.itemPrice}">
+								<td>
+									<p>[[${item.itemName}]]<br>
+										[[${item.itemSize.name}]]
+									</p>
+								</td>
+								<td>
+									$[[${#numbers.formatDecimal(item.itemPrice, 0, 'COMMA', 2, 'POINT')}]]
+								</td>
+								<td>
+									<div class="input-group" style="width:140px;">
+										<th:block th:if="${action != 'showDetails'}">
+											<button class="btn btn-outline-secondary btn-minus" type="button">−</button>
+											<input type="text" class="form-control text-center qty-input" readonly
+												th:field="*{items[__${item.index}__].quantity}" />
+											<button class="btn btn-outline-secondary btn-plus" type="button">+</button>
+										</th:block>
+										<th:block th:if="${action == 'showDetails'}">
+											<p class="text-start">[[*{items[__${item.index}__].quantity}]]</p>
+										</th:block>
+									</div>
+								</td>
+								<td>
+									<span class="row-total">
+										$[[*{#numbers.formatDecimal(items[__${item.index}__].total, 0, 'COMMA', 2,
+										'POINT')}]]
+									</span>
+									<input type="hidden" class="total-input"
+										th:field="*{items[__${item.index}__].total}" />
+									<input type="hidden" th:field="*{items[__${item.index}__].itemId}"
+										th:value="${item.itemId}" />
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="d-block d-md-none">
+					<div th:each="item, stat : ${entry.value}" class="card mb-3" th:data-price="${item.itemPrice}">
+
+						<div class="card-body">
+							<h6 class="card-title mb-1">
+								[[${item.itemName}]] – [[${item.itemSize.name}]]
+							</h6>
+
+							<p class="mb-1">
+								<strong>Precio:</strong>
 								$[[${#numbers.formatDecimal(item.itemPrice, 0, 'COMMA', 2, 'POINT')}]]
-							</td>
-							<td>
-								<div class="input-group" style="width:140px;">
-									<th:block th:if="${action != 'showDetails'}">
-										<button class="btn btn-outline-secondary btn-minus" type="button">−</button>
-										<input type="text" class="form-control text-center qty-input" readonly
-											th:field="*{items[__${item.index}__].quantity}" />
-										<button class="btn btn-outline-secondary btn-plus" type="button">+</button>
-									</th:block>
-									<th:block th:if="${action == 'showDetails'}">
-										<p class="text-start">[[*{items[__${item.index}__].quantity}]]</p>
-									</th:block>
-								</div>
-							</td>
-							<td>
+							</p>
+
+							<div class="d-flex align-items-center gap-2 my-2">
+								<th:block th:if="${action != 'showDetails'}">
+									<button class="btn btn-outline-secondary btn-minus px-3">−</button>
+
+									<input type="text" class="form-control text-center qty-input" style="width:60px"
+										readonly th:field="*{items[__${item.index}__].quantity}" />
+
+									<button class="btn btn-outline-secondary btn-plus px-3">+</button>
+								</th:block>
+
+								<th:block th:if="${action == 'showDetails'}">
+									<span>Cantidad: [[*{items[__${item.index}__].quantity}]]</span>
+								</th:block>
+							</div>
+
+							<p class="mb-0">
+								<strong>Total:</strong>
 								<span class="row-total">
-									$[[*{#numbers.formatDecimal(items[__${item.index}__].total, 0, 'COMMA', 2, 'POINT')}]]
+									$[[*{#numbers.formatDecimal(items[__${item.index}__].total, 0, 'COMMA', 2,
+									'POINT')}]]
 								</span>
-								<input type="hidden" class="total-input" th:field="*{items[__${item.index}__].total}" />
-								<input type="hidden" th:field="*{items[__${item.index}__].itemId}"
-									th:value="${item.itemId}" />
-							</td>
-						</tr>
-					</tbody>
-				</table>
+							</p>
+
+							<input type="hidden" class="total-input" th:field="*{items[__${item.index}__].total}" />
+							<input type="hidden" th:field="*{items[__${item.index}__].itemId}"
+								th:value="${item.itemId}" />
+						</div>
+					</div>
+				</div>
+
 			</th:block>
-			<h5>
-				Total
-				<span id="order-total">
-					$[[*{#numbers.formatDecimal(total, 0, 'COMMA', 2, 'POINT')}]]
-				</span>
-			</h5>
-			<button class="btn btn-primary" th:text="${btnAction}"></button>
+			<div class="sticky-bottom bg-white p-3 border-top">
+				<h5 class="mb-2">
+					Total:
+					<span id="order-total">
+						$[[*{#numbers.formatDecimal(total, 0, 'COMMA', 2, 'POINT')}]]
+					</span>
+				</h5>
+				<button class="btn btn-primary w-100" th:text="${btnAction}"></button>
+			</div>
 			<input type="hidden" th:field="*{updateItems}" />
 		</form>
 		<script>
