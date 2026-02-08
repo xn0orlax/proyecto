@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en" th:replace="~{layout/layout :: layout}">
+
+<head>
+	<title>${title}</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+	<meta charset="UTF-8">
+
+</head>
+
+<body class="container">
+
+	<div th:fragment="content">
+		<h2 th:text="${operation}"></h2>
+
+		<form th:action="@{/orders/save}" th:object="${orderForm}" method="post">
+			<input type="hidden" th:field="*{orderId}" />
+			<div class="mb-3">
+				<label>Descripción:</label>
+				<input class="form-control" th:field="*{orderDescription}" />
+			</div>
+			<th:block th:each="entry : ${itemsByCategory}">
+				<h4 th:text="${entry.key.name}" class="mt-4"></h4>
+				<div class="d-none d-md-block">
+					<table class="table align-middle">
+						<thead>
+							<tr>
+								<th class="w-25" scope="col">Producto</th>
+								<th class="w-25" scope="col">P. Unitario</th>
+								<th class="w-25" scope="col">Cantidad</th>
+								<th class="w-25" scope="col">Total</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="item, stat : ${entry.value}" th:data-price="${item.itemPrice}">
+								<td>
+									<p>[[${item.itemName}]]<br>
+										[[${item.itemSize.name}]]
+									</p>
+								</td>
+								<td>
+									$[[${#numbers.formatDecimal(item.itemPrice, 0, 'COMMA', 2, 'POINT')}]]
+								</td>
+								<td>
+									<div class="input-group" style="width:140px;">
+										<th:block th:if="${action != 'showDetails'}">
+											<button class="btn btn-outline-secondary btn-minus" type="button">−</button>
+											<input type="text" class="form-control text-center qty-input" readonly
+												th:field="*{items[__${item.index}__].quantity}" />
+											<button class="btn btn-outline-secondary btn-plus" type="button">+</button>
+										</th:block>
+										<th:block th:if="${action == 'showDetails'}">
+											<p class="text-start">[[*{items[__${item.index}__].quantity}]]</p>
+										</th:block>
+									</div>
+								</td>
+								<td>
+									<span class="row-total">
+										$[[*{#numbers.formatDecimal(items[__${item.index}__].total, 0, 'COMMA', 2,
+										'POINT')}]]
+									</span>
+									<input type="hidden" class="total-input mobile-only"
+										th:field="*{items[__${item.index}__].total}" />
+									<input type="hidden" th:field="*{items[__${item.index}__].itemId}"
+										th:value="${item.itemId}" />
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="d-block d-md-none">
+					<div th:each="item, stat : ${entry.value}" class="card mb-3" th:data-price="${item.itemPrice}">
+
+						<div class="card-body">
+							<h6 class="card-title mb-1">
+								[[${item.itemName}]] – [[${item.itemSize.name}]]
+							</h6>
+
+							<p class="mb-1">
+								<strong>Precio:</strong>
+								$[[${#numbers.formatDecimal(item.itemPrice, 0, 'COMMA', 2, 'POINT')}]]
+							</p>
+
+							<div class="d-flex align-items-center gap-2 my-2">
+								<th:block th:if="${action != 'showDetails'}">
+									<button class="btn btn-outline-secondary btn-minus px-3" type="button">−</button>
+
+									<input type="text" class="form-control text-center qty-input" style="width:60px"
+										th:field="*{items[__${item.index}__].quantity}" />
+
+									<button class="btn btn-outline-secondary btn-plus px-3" type="button">+</button>
+								</th:block>
+
+								<th:block th:if="${action == 'showDetails'}">
+									<span>Cantidad: [[*{items[__${item.index}__].quantity}]]</span>
+								</th:block>
+							</div>
+
+							<p class="mb-0">
+								<strong>Total:</strong>
+								<span class="row-total">
+									$[[*{#numbers.formatDecimal(items[__${item.index}__].total, 0, 'COMMA', 2,
+									'POINT')}]]
+								</span>
+							</p>
+
+							<input type="hidden" class="total-input desktop-only"
+								th:field="*{items[__${item.index}__].total}" />
+							<input type="hidden" th:field="*{items[__${item.index}__].itemId}"
+								th:value="${item.itemId}" />
+						</div>
+					</div>
+				</div>
+
+			</th:block>
+			<div class="sticky-bottom bg-white p-3 border-top">
+				<h5 class="mb-2">
+					Total:
+					<span id="order-total">
+						$[[*{#numbers.formatDecimal(total, 0, 'COMMA', 2, 'POINT')}]]
+					</span>
+				</h5>
+				<button class="btn btn-primary w-100" th:text="${btnAction}"></button>
+			</div>
+			<input type="hidden" th:field="*{updateItems}" />
+		</form>
+		<script>
+			function toggleInputsByViewport() {
+				const isMobile = window.innerWidth < 768;
+
+				document.querySelectorAll('.desktop-only').forEach(i => {
+					i.disabled = isMobile;
+				});
+
+				document.querySelectorAll('.mobile-only').forEach(i => {
+					i.disabled = !isMobile;
+				});
+			}
+
+			window.addEventListener('load', toggleInputsByViewport);
+			window.addEventListener('resize', toggleInputsByViewport);
+			document.addEventListener('click', function (e) {
+				if (!e.target.classList.contains('btn-minus') &&
+					!e.target.classList.contains('btn-plus')) {
+					return;
+				}
+
+				const row = e.target.closest('tr, .card');
+				if (!row) return;
+
+				const input = row.querySelector('.qty-input');
+				const price = parseFloat(row.dataset.price);
+				let quantity = parseInt(input.value) || 0;
+
+				if (e.target.classList.contains('btn-minus') && quantity > 0) {
+					quantity--;
+				}
+				if (e.target.classList.contains('btn-plus')) {
+					quantity++;
+				}
+
+				input.value = quantity;
+
+				const rowTotal = price * quantity;
+
+				row.querySelector('.row-total').textContent =
+					'$' + rowTotal.toFixed(2);
+
+				row.querySelector('.total-input:not(:disabled)').value =
+					rowTotal.toFixed(2);
+
+				updateOrderTotal();
+			});
+
+			function updateOrderTotal() {
+				let total = 0;
+				document.querySelectorAll('.total-input:not(:disabled)').forEach(input => {
+					total += parseFloat(input.value) || 0;
+				});
+				document.getElementById('order-total').textContent =
+					'$' + total.toFixed(2);
+			}
+		</script>
+	</div>
+
+</body>
+
+</html>
