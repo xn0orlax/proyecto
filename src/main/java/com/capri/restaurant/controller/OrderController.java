@@ -119,6 +119,7 @@ public class OrderController {
 	@PostMapping("/save")
 	public String guardar(@ModelAttribute OrderFormDto orderForm, RedirectAttributes ra) {
 		try {
+			System.out.println(orderForm.toString());
 			orderService.saveOrderWithItems(orderForm);
 			ra.addFlashAttribute("success", true);
 		} catch (IllegalStateException e) {

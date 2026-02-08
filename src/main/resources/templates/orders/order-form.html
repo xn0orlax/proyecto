@@ -83,12 +83,12 @@
 
 							<div class="d-flex align-items-center gap-2 my-2">
 								<th:block th:if="${action != 'showDetails'}">
-									<button class="btn btn-outline-secondary btn-minus px-3">−</button>
+									<button class="btn btn-outline-secondary btn-minus px-3" type="button">−</button>
 
 									<input type="text" class="form-control text-center qty-input" style="width:60px"
-										readonly th:field="*{items[__${item.index}__].quantity}" />
+										th:field="*{items[__${item.index}__].quantity}" />
 
-									<button class="btn btn-outline-secondary btn-plus px-3">+</button>
+									<button class="btn btn-outline-secondary btn-plus px-3" type="button">+</button>
 								</th:block>
 
 								<th:block th:if="${action == 'showDetails'}">
@@ -124,12 +124,27 @@
 			<input type="hidden" th:field="*{updateItems}" />
 		</form>
 		<script>
+			function toggleInputsByViewport() {
+				const isMobile = window.innerWidth < 768;
+
+				document.querySelectorAll('.d-md-block input').forEach(i => {
+					i.disabled = isMobile;
+				});
+
+				document.querySelectorAll('.d-md-none input').forEach(i => {
+					i.disabled = !isMobile;
+				});
+			}
+
+			window.addEventListener('load', toggleInputsByViewport);
+			window.addEventListener('resize', toggleInputsByViewport);
 			document.addEventListener('click', function (e) {
 				if (!e.target.classList.contains('btn-minus') &&
 					!e.target.classList.contains('btn-plus')) {
 					return;
 				}
-				const row = e.target.closest('tr');
+				const row = e.target.closest('tr, .card');
+				if (!row) return;
 				const input = row.querySelector('.qty-input');
 				const price = parseFloat(row.dataset.price);
 				let quantity = parseInt(input.value) || 0;
@@ -154,7 +169,7 @@
 					total += parseFloat(input.value) || 0;
 				});
 				document.getElementById('order-total').textContent =
-					total.toFixed(2);
+					'$' + total.toFixed(2);
 			}
 		</script>
 	</div>
