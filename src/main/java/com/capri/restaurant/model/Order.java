@@ -43,12 +43,15 @@ public class Order {
 
 	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<OrderItem> items = new ArrayList<>();
-	
+
 	@Enumerated(EnumType.STRING)
 	private OrderStatus status;
 
+	@Column(name = "shipping_cost")
+	private BigDecimal shippingCost;
+
 	private BigDecimal total;
-	
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "business_day_id", nullable = false)
 	private BusinessDay businessDay;
@@ -121,10 +124,12 @@ public class Order {
 		this.businessDay = businessDay;
 	}
 
-	@Override
-	public String toString() {
-		return "Order [id=" + id + ", description=" + description + ", createdAt=" + createdAt + ", updatedAt="
-				+ updatedAt + ", status=" + status + ", total=" + total + ", items" + items + "]";
+	public BigDecimal getShippingCost() {
+		return shippingCost;
+	}
+
+	public void setShippingCost(BigDecimal shippingCost) {
+		this.shippingCost = shippingCost;
 	}
 
 }

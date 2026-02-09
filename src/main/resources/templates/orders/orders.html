@@ -17,12 +17,9 @@
 			</th:block>
 		</div>
 		<h2>[[${title}]]</h2>
-		<!--		<a th:href="@{/orders/new}" class="btn btn-primary mb-3">Agregar orden</a>-->
 		<a th:href="@{/orders/new}" class="btn btn-primary w-100 w-md-auto mb-3">
 			<i class="bi bi-plus-circle me-1"></i> Agregar orden
 		</a>
-
-
 		<th:block th:if="${!orders.isEmpty()}">
 			<table class="table table-hover d-none d-md-table">
 				<thead>
@@ -60,10 +57,9 @@
 						</td>
 						<td>
 							<th:block th:if="${order.status.description == 'En progreso'}">
-								<form th:action="@{/orders/{id}/deliver(id=${order.id})}" method="post"
-									class="d-inline">
-									<button class="btn btn-success btn-sm"
-										onclick="return confirm('¿Marcar esta orden como ENTREGADA?')">
+								<form th:action="@{/orders/{id}/deliver(id=${order.id})}" method="post" class="d-inline"
+									onsubmit="return confirmDeliver();">
+									<button class="btn btn-success btn-sm">
 										Entregar
 									</button>
 								</form>
@@ -74,9 +70,9 @@
 							</th:block>
 							<th:block th:if="${order.status.description == 'En progreso'}"
 								sec:authorize="hasRole('ADMIN')">
-								<form th:action="@{/orders/{id}/cancel(id=${order.id})}" method="post" class="d-inline">
-									<button class="btn btn-danger btn-sm"
-										th:onclick="return confirm('¿Cancelar esta orden?')">
+								<form th:action="@{/orders/{id}/cancel(id=${order.id})}" method="post" class="d-inline"
+									onsubmit="return confirmCancel();">
+									<button class="btn btn-danger btn-sm">
 										Cancelar
 									</button>
 								</form>
@@ -114,7 +110,8 @@
 								Detalles
 							</a>
 							<th:block th:if="${order.status.description == 'En progreso'}">
-								<form th:action="@{/orders/{id}/deliver(id=${order.id})}" method="post">
+								<form th:action="@{/orders/{id}/deliver(id=${order.id})}" method="post"
+									onsubmit="return confirmDeliver();">
 									<button class="btn btn-success btn-sm">
 										Entregar
 									</button>
@@ -122,9 +119,9 @@
 								<a th:href="@{/orders/edit/{id}(id=${order.id})}"
 									class="btn btn-warning btn-sm">Editar</a>
 								<form sec:authorize="hasRole('ADMIN')"
-									th:action="@{/orders/{id}/cancel(id=${order.id})}" method="post" class="d-inline">
-									<button class="btn btn-danger btn-sm"
-										th:onclick="return confirm('¿Cancelar esta orden?')">
+									th:action="@{/orders/{id}/cancel(id=${order.id})}" method="post" class="d-inline"
+									onsubmit="return confirmCancel();">
+									<button class="btn btn-danger btn-sm">
 										Cancelar
 									</button>
 								</form>
@@ -133,16 +130,18 @@
 					</div>
 				</div>
 			</div>
+			<!-- TOTAL -->
+			<div class="sticky-bottom bg-white border-top p-3">
+				<h3>
+					Total: $[[${#numbers.formatDecimal(total, 0, 'COMMA', 2, 'POINT')}]]
+				</h3>
+			</div>
 
-			<h3>
-				Total: $[[${#numbers.formatDecimal(total, 0, 'COMMA', 2, 'POINT')}]]
-			</h3>
+			</form>
 		</th:block>
-
 		<h3 th:if="${orders.isEmpty()}">No hay órdenes para mostrar</h3>
-
+		<script th:src="@{/js/orders.js}"></script>
 	</div>
-
 </body>
 
 </html>

@@ -4,7 +4,7 @@ function updateOrderTotal() {
 	document.querySelectorAll('.total-input').forEach(input => {
 		total += parseFloat(input.value) || 0;
 	});
-
+	
 	document.getElementById('order-total').textContent =
 		'$' + total.toFixed(2);
 }

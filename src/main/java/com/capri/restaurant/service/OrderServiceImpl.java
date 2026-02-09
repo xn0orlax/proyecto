@@ -74,6 +74,7 @@ public class OrderServiceImpl implements OrderService {
 				}
 			}
 			order.getItems().clear();
+			order.setShippingCost(orderFormDto.getShippingCost());
 			order.setTotal(BigDecimal.ZERO);
 			for (OrderItemFormDto dto : orderFormDto.getItems()) {
 				Product product = productRepository.findById(dto.getItemId())
@@ -87,6 +88,7 @@ public class OrderServiceImpl implements OrderService {
 				order.setTotal(order.getTotal().add(itemTotal));
 				order.getItems().add(item);
 			}
+			order.setTotal(order.getTotal().add(order.getShippingCost()));
 		}
 		return orderRepository.save(order);
 	}

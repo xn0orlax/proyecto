@@ -94,6 +94,7 @@ public class OrderController {
 		});
 		orderForm.setItems(flatItems);
 		orderForm.setUpdateItems(true);
+		orderForm.setShippingCost(BigDecimal.ZERO);
 		orderForm.setTotal(BigDecimal.ZERO);
 		model.addAttribute("orderForm", orderForm);
 		model.addAttribute("itemsByCategory", itemsByCategory);
@@ -119,7 +120,6 @@ public class OrderController {
 	@PostMapping("/save")
 	public String guardar(@ModelAttribute OrderFormDto orderForm, RedirectAttributes ra) {
 		try {
-			System.out.println(orderForm.toString());
 			orderService.saveOrderWithItems(orderForm);
 			ra.addFlashAttribute("success", true);
 		} catch (IllegalStateException e) {
@@ -177,6 +177,7 @@ public class OrderController {
 		orderForm.setOrderDescription(order.getDescription());
 		orderForm.setOrderUpdatedAt(order.getUpdatedAt());
 		orderForm.setStatus(order.getStatus());
+		orderForm.setShippingCost(order.getShippingCost());
 		orderForm.setTotal(order.getTotal());
 		orderForm.setItems(flatItems);
 		orderForm.setUpdateItems(true);

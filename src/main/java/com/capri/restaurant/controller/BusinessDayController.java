@@ -101,4 +101,9 @@ public class BusinessDayController {
 		return "business-day/business-day-detail";
 	}
 	
+	@GetMapping("/details/order/{id}")
+	public String showOrderDetail(@PathVariable Long id) {
+		return "redirect:/orders/details/" + id;
+	}
+	
 }

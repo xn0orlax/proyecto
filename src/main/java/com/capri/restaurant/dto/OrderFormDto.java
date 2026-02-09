@@ -17,6 +17,8 @@ public class OrderFormDto {
 
 	private List<OrderItemFormDto> items = new ArrayList<>();
 
+	private BigDecimal shippingCost;
+
 	private BigDecimal total;
 
 	private OrderStatus status;
@@ -79,10 +81,19 @@ public class OrderFormDto {
 		this.updateItems = updateItems;
 	}
 
+	public BigDecimal getShippingCost() {
+		return shippingCost;
+	}
+
+	public void setShippingCost(BigDecimal shippingCost) {
+		this.shippingCost = shippingCost;
+	}
+
 	@Override
 	public String toString() {
 		return "OrderFormDto [orderId=" + orderId + ", orderDescription=" + orderDescription + ", orderUpdatedAt="
-				+ orderUpdatedAt + ", items=" + items + ", status=" + status + ", updateItems=" + updateItems + "]";
+				+ orderUpdatedAt + ", items=" + items + ", shippingCost=" + shippingCost + ", total=" + total
+				+ ", status=" + status + ", updateItems=" + updateItems + "]";
 	}
 
 }

@@ -33,7 +33,7 @@
 					<table class="table align-middle">
 						<thead>
 							<tr>
-								<th>Producto</th>
+								<th	>Producto</th>
 								<th class="d-none d-md-table-cell">Precio</th>
 								<th>Cantidad</th>
 								<th>Total</th>
@@ -58,13 +58,14 @@
 
 								<!-- Cantidad -->
 								<td>
+									
 									<div class="input-group input-group-sm" style="max-width:140px;">
-										<button class="btn btn-outline-secondary btn-minus" type="button">−</button>
+										<button th:if="${action!='showDetails'}" class="btn btn-outline-secondary btn-minus" type="button">−</button>
 
 										<input type="text" class="form-control text-center qty-input" readonly
 											th:field="*{items[__${item.index}__].quantity}" />
 
-										<button class="btn btn-outline-secondary btn-plus" type="button">+</button>
+										<button th:if="${action!='showDetails'}" class="btn btn-outline-secondary btn-plus" type="button">+</button>
 									</div>
 
 									<!-- Precio mobile -->
@@ -91,6 +92,11 @@
 					</table>
 				</div>
 			</th:block>
+			
+			<div class="mb-3">
+				<label class="form-label">Costo de envío:</label>
+				<input class="form-control total-input" th:field="*{shippingCost}" type="number" />
+			</div>
 
 			<!-- TOTAL -->
 			<div class="sticky-bottom bg-white border-top p-3">
